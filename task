@@ -1,0 +1,34 @@
+from datetime import datetime
+
+def solution(A, D):
+    balance = 0
+    monthly_fee = 5
+    card_payments = 0
+    current_month = datetime.strptime(D[0], '%Y-%m-%d').replace(day=1)
+
+    for i in range(len(A)):
+        transaction_date = datetime.strptime(D[i], '%Y-%m-%d').replace(day=1)
+
+        if transaction_date.year > current_month.year or (transaction_date.year == current_month.year and transaction_date.month > current_month.month):
+            # Move to the next month
+            current_month = current_month.replace(month=current_month.month + 1)
+            card_payments = 0
+            monthly_fee = 5
+
+        if A[i] >= 0:
+            # Incoming transfer
+            balance += A[i]
+        else:
+            # Card payment
+            balance -= A[i]
+            card_payments += 1
+
+            if card_payments >= 3 and -A[i] >= 100:
+                # Waive the monthly fee
+                monthly_fee = 0
+            elif monthly_fee > 0:
+                # Deduct the monthly fee
+                balance -= monthly_fee
+                monthly_fee = 5
+
+    return balance
